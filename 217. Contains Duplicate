@@ -1,0 +1,28 @@
+TYPES: BEGIN OF ty_hash,
+       key type i,
+       end of ty_hash.
+
+DATA: gt_hashSet type HASHED TABLE OF ty_hash WITH UNIQUE KEY key,
+      gs_hashSet type ty_hash,
+      gt_input type STANDARD TABLE OF i,
+      gs_input type i,
+      lv_output type bool value abap_true.
+
+
+gt_input = VALUE #( ( 1 ) ( 2 ) ( 3 ) ( 4 ) ).
+
+LOOP AT gt_input INTO gs_input.
+    READ TABLE gt_hashSet into gs_hashSet WITH KEY key = gs_input.
+    if sy-subrc = 0.
+        WRITE: 'TRUE'.
+        lv_output = abap_false.
+
+    else.
+        gs_hashSet-key = gs_input.
+        INSERT gs_hashset INTO TABLE gt_hashSet.
+    endif.
+
+ENDLOOP.
+if ( lv_output eq abap_true ).
+    WRITE: 'False'.
+endif.
