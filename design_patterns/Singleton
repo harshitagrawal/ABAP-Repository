@@ -1,0 +1,53 @@
+*&---------------------------------------------------------------------*
+*& Report zhcl_singleton
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zhcl_singleton.
+
+CLASS zcl_singleton DEFINITION FINAL CREATE PRIVATE.
+
+  PUBLIC SECTION.
+    CLASS-METHODS get_instance RETURNING VALUE(ro_instance) TYPE REF TO zcl_singleton.
+    METHODS: get_value RETURNING VALUE(rv_value) TYPE i.
+    METHODS: set_value IMPORTING iv_val TYPE i.
+
+  PRIVATE SECTION.
+    DATA: lv_value TYPE i.
+    CLASS-DATA: go_instance TYPE REF TO zcl_singleton.
+    CLASS-METHODS create_instance RETURNING VALUE(rv_instance) TYPE REF TO zcl_singleton.
+      
+ENDCLASS.
+
+CLASS zcl_singleton IMPLEMENTATION.
+  METHOD get_instance.
+    IF go_instance IS NOT BOUND.
+      go_instance = create_instance( ).
+    ENDIF.
+    ro_instance = go_instance.
+  ENDMETHOD.
+  METHOD create_instance.
+    rv_instance = NEW zcl_singleton(  ).
+  ENDMETHOD.
+  METHOD get_value.
+    rv_value = go_instance->lv_value.
+  ENDMETHOD.
+  METHOD set_value.
+    go_instance->lv_value = iv_val.
+  ENDMETHOD.
+ENDCLASS.
+      
+**********************************************************************
+
+START-OF-SELECTION.
+
+  DATA: lo_obj TYPE REF TO zcl_singleton.
+  DATA: lo_obj2 TYPE REF TO zcl_singleton.
+
+  lo_obj = zcl_singleton=>get_instance( ).
+
+  lo_obj->set_value( 1 ).
+  cl_demo_output=>display( lo_obj->get_value(  ) ).
+
+  lo_obj2 = zcl_singleton=>get_instance( ).
+  cl_demo_output=>display( lo_obj2->get_value(  ) ).
